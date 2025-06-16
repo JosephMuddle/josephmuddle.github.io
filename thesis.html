@@ -1,0 +1,939 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang=""><head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="" />
+  <title>Lp-optimal samplers for Pseudo-Random Number Generation </title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    div.abstract {
+      margin: 2em 2em 2em 2em;
+      text-align: left;
+      font-size: 85%;
+    }
+    div.abstract-title {
+      font-weight: bold;
+      text-align: center;
+      padding: 0;
+      margin-bottom: 0.5em;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+<style>
+                .thebibliography ol {
+                    padding-left: 2em;
+                }
+                .thebibliography li {
+                    margin-bottom: 0.5em;
+                    line-height: 1.4;
+                }
+                a[href^="#ref-"]:hover {
+                    text-decoration: underline !important;
+                }
+            </style></head>
+<body>
+<header id="title-block-header">
+<h1 class="title"><span class="math inline">\(L^p\)</span>-optimal
+samplers for Pseudo-Random Number Generation<br /></h1>
+<p class="author">Joseph Muddle</p>
+<div class="abstract">
+<div class="abstract-title">Abstract</div>
+<p>This paper proposes a novel method for pseudo-random number
+generation with guarantees of optimality in any <span class="math inline">\(L^p\)</span> distance between a 1-dimensional
+target distribution and an empirical distribution defined by <span class="math inline">\(n\)</span> pseudo-random numbers. This paper
+provides a method for selecting samples on the <span class="math inline">\([0,1]\)</span> interval which, when transformed
+using the inverse transform method, creates a distribution with the
+lowest <span class="math inline">\(L^p\)</span> distance between its
+Cumulative Distribution Function and a target distribution’s Cumulative
+Distribution Function. Notably, this is proven optimal for all
+distributions which admit the inverse transform method.</p>
+</div>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a>
+<ul>
+<li><a href="#motivation" id="toc-motivation">Motivation</a></li>
+<li><a href="#overview-and-terminology" id="toc-overview-and-terminology">Overview and terminology</a></li>
+</ul></li>
+<li><a href="#related-work" id="toc-related-work">Related Work</a></li>
+<li><a href="#methods" id="toc-methods">Methods</a>
+<ul>
+<li><a href="#theoretically-optimal-samples" id="toc-theoretically-optimal-samples">Theoretically optimal
+samples</a></li>
+<li><a href="#practical-optimal-samples" id="toc-practical-optimal-samples">Practical optimal samples</a></li>
+</ul></li>
+<li><a href="#experiments-and-results" id="toc-experiments-and-results">Experiments and Results</a>
+<ul>
+<li><a href="#inverse-transform-sampling-optimal-vs-random" id="toc-inverse-transform-sampling-optimal-vs-random">Inverse transform
+sampling: Optimal vs Random</a></li>
+<li><a href="#approximating-pi-sobol-sequence-vs-optimal-sampling" id="toc-approximating-pi-sobol-sequence-vs-optimal-sampling">Approximating
+<span class="math inline">\(\pi\)</span>: Sobol Sequence vs Optimal
+Sampling</a></li>
+<li><a href="#approximating-eulers-constant-gamma-halton-sequence-vs-optimal-samples" id="toc-approximating-eulers-constant-gamma-halton-sequence-vs-optimal-samples">Approximating
+Euler’s Constant <span class="math inline">\(\gamma\)</span>: Halton
+Sequence vs Optimal Samples</a></li>
+<li><a href="#optimal-samples-as-input-for-more-complex-distributions-box-muller" id="toc-optimal-samples-as-input-for-more-complex-distributions-box-muller">Optimal
+Samples as input for more complex distributions: Box Muller</a></li>
+</ul></li>
+<li><a href="#conclusions-and-further-work" id="toc-conclusions-and-further-work">Conclusions and further work</a>
+<ul>
+<li><a href="#contributions" id="toc-contributions">Contributions</a></li>
+<li><a href="#further-work" id="toc-further-work">Further work</a></li>
+</ul></li>
+</ul>
+</nav>
+<div class="IEEEkeywords">
+<p>Sampling, Optimization, LP distance, Wasserstein, Optimal
+Transport</p>
+</div>
+<h1 class="unnumbered" id="introduction">Introduction</h1>
+<h2 class="unnumbered" id="motivation">Motivation</h2>
+<p>Sampling from a known distribution is an important task in a diverse
+range of fields from econometrics to computational biology. In
+particular, sampling from a known distribution is an important task for
+numerical approximations of properties of that distribution.
+<em>Monte-Carlo Integration</em> (MC) <a href="#ref-1" style="color: blue; text-decoration: none;">[1]</a> works by taking <span class="math inline">\(n\)</span> random samples from the domain of a
+function <span class="math inline">\(f(x)\)</span> and averaging the
+value of the function evaluated at these samples: <span class="math display">\[\int f(x) dx \approx \frac{1}{n}\sum_{i=1}^n
+f(x_i)\]</span> <em>Quasi Monte-Carlo integration</em> (QMC) <a href="#ref-2" style="color: blue; text-decoration: none;">[2]</a> works the same way, but
+with deterministic rather than random sampling. As Monte-Carlo
+integration relies on random sampling, convergence to the true integral
+happens as the number of samples approaches infinity, but does not
+provide guarantees for finite samples. A method that guarantees
+optimality in samples in terms of <span class="math inline">\(L^p\)</span> distance between empirical
+distribution and continuous distribution would be an efficient approach
+to approximation of integrals with finite samples. Another important use
+for sampling from a known distribution is in <em>Markov Chain Monte
+Carlo</em> (MCMC) methods <a href="#ref-3" style="color: blue; text-decoration: none;">[3]</a>, notably the <em>Metropolis-Hastings
+Algorithm</em> <a href="#ref-4" style="color: blue; text-decoration: none;">[4]</a>, wherein a known proposal
+distribution is sampled based on the current state. The method proposed
+in this paper could work as a part of MCMC algorithms to improve this
+sampling process. Furthermore, sampling is an important task in signal
+processing, wherein QMC sampling methods see extensive use <a href="#ref-5" style="color: blue; text-decoration: none;">[5]</a>. Here, again,
+optimal sampling would have utility. Several other approaches to
+sampling exist, though many of them assume an infinite source of fair
+random bits <a href="#ref-6" style="color: blue; text-decoration: none;">[6]</a> in order to
+provide approximations of target distributions, such as <em>Discrete
+Distribution Generating Trees</em> (DDGT) <a href="#ref-7" style="color: blue; text-decoration: none;">[7]</a>, which construct trees such that the
+probability of reaching each leaf is the same as the probability of the
+label value of the leaf within the target distribution. The source of
+this randomness is often not specified in the literature on sampling,
+but in actual implementations the source of "random" bits is actually
+deterministic in some way, taking as input some value from the computer
+generating the random number <a href="#ref-8" style="color: blue; text-decoration: none;">[8]</a>. As these methods depend on a fair and
+random source of infinite random bits, not having such a source is an
+issue in attempting to verify the guarantees provided by such methods.
+Other methods for generating randomness exist and depend on external
+sources, for example cosmic radiation. However, harnessing this for
+production of random numbers requires specialist hardware and is often
+slow, precluding it from wide adoption. Additionally, these methods tend
+to have high levels of computational complexity <a href="#ref-6" style="color: blue; text-decoration: none;">[6]</a><a href="#ref-9" style="color: blue; text-decoration: none;">[9]</a>. This means that these algorithms are, in
+practice, often not used. Given the impracticality of the theoretically
+ideal source of fair random bits, this paper does not assume a source of
+randomness and instead provides a deterministic sampling method. This
+paper provides a method which works in tandem with existing sampling
+techniques in such a way that they are more computationally efficient
+and do not assume a source of randomness. The method proposed herein
+assumes a given (or numerically derived) form of a target distribution,
+and, given this form, produces the optimal <span class="math inline">\(n\)</span> samples in terms of <span class="math inline">\(L^p\)</span> distance.</p>
+<h2 class="unnumbered" id="overview-and-terminology">Overview and
+terminology</h2>
+<p>Cumulative Distribution Functions (CDFs) are functions which exist
+for all measures on the reals and can therefore describe probability
+distributions. CDFs are monotonically increasing and therefore
+invertible. The inverse of a CDF is referred to as a Quantile function,
+and takes as input a value on the <span class="math inline">\([0,1]\)</span> interval and returns a value from
+the domain of the correspondent PDF. A Quantile function is therefore a
+function of type: <span class="math display">\[Q(x): [0,1] \rightarrow
+(-\infty, \infty)\]</span></p>
+<p>Quantile functions therefore allow sampling from a target
+distribution if the distribution’s Quantile function exists in a closed
+analytical form. This technique is called <em>inverse transform
+sampling</em> <a href="#ref-10" style="color: blue; text-decoration: none;">[10]</a>.</p>
+<p>The <em><span class="math inline">\(L^p\)</span> distance</em> <a href="#ref-11" style="color: blue; text-decoration: none;">[11]</a> is a measure of the distance
+between two points in vector space. In this paper, <span class="math inline">\(L^p\)</span> distance refers to the distance
+between two CDFs. In the case of one dimension, its formulation is <span class="math display">\[\left(\int_{-\infty}^{\infty} |F(x)-G(x)|^p
+dx\right)^{\frac{1}{p}}\]</span> Most commonly used in existing
+literature is the <span class="math inline">\(L^2\)</span> (Euclidean)
+or <span class="math inline">\(L^1\)</span> (Manhattan) distance.</p>
+<p>The method proposed herein generates a sequence of <span class="math inline">\(n\)</span> samples from the <span class="math inline">\([0,1]\)</span> interval such that when used as
+inputs to a Quantile function of a given distribution, the values
+returned form a distribution which is as close as possible to the target
+distribution in terms of <span class="math inline">\(L^p\)</span>
+distance between their CDFs.</p>
+<h1 class="unnumbered" id="related-work">Related Work</h1>
+<p>Given the above-described importance of sampling in a range of
+fields, optimal sampling is a rich area of research. There is diversity
+in the approaches taken to tackling this problem, primarily motivated by
+different definitions of optimality.</p>
+<p>Similar in objective to this paper, "Optimal Samples from Selected
+Probability Distributions" <a href="#ref-12" style="color: blue; text-decoration: none;">[12]</a> seeks a deterministic approach to
+producing the best samples on the <span class="math inline">\([0,1]\)</span> interval such that applying the
+inverse transform method on those samples renders the best approximation
+of some target distribution. Also similar to this paper, <a href="#ref-12" style="color: blue; text-decoration: none;">[12]</a> approaches the
+problem of optimal samples as an optimization problem. However, the
+topic is approached experimentally, rather than theoretically. As such,
+<a href="#ref-12" style="color: blue; text-decoration: none;">[12]</a> does not
+make observations about optimal sampling in general, and instead
+provides a black box optimization approach to the problem. The use of
+difference in moments also distinguishes <a href="#ref-12" style="color: blue; text-decoration: none;">[12]</a> from the current paper.</p>
+<p>Other papers define "optimal" samplers in a different way to this
+paper, but have useful insights in the construction of samplers.
+"Optimal Approximate Sampling from Discrete Probability Distribution"
+<a href="#ref-9" style="color: blue; text-decoration: none;">[9]</a> has two optimality
+criteria. The first, and most important, is entropy. Entropy is defined
+as a measure of stochasticity, and, due to the relative rarity and
+expense of true randomness described above, much work has been done
+treating entropy as a resource to be conserved through an algorithm,
+with random bits being used as efficiently as possible. <a href="#ref-9" style="color: blue; text-decoration: none;">[9]</a> Assumes the existence of a
+source of fair random bits, and describes the problems with random
+sampling methods, such as the DDGT proposed by Knuth and Yao <a href="#ref-7" style="color: blue; text-decoration: none;">[7]</a>. Though the Knuth-Yao
+algorithm provides a method for entropy-optimal construction of the DDGT
+trees for a given distribution, in practical terms such trees must be
+truncated to a finite level of precision in terms of the number of bits
+used to describe a given distribution. This means that each DDGT of
+limited precision (therefore every DDGT running on real hardware) is an
+approximation of any given distribution, with some inherent error.
+Therefore, <a href="#ref-9" style="color: blue; text-decoration: none;">[9]</a> presents a
+method for creating as accurate a sampler as possible given a specific
+level of precision in terms of bits available to describe a
+distribution. <em>Saad et al</em> build upon these findings in <a href="#ref-6" style="color: blue; text-decoration: none;">[6]</a> to improve the computational
+efficiency of DDGT sampling of probability distributions. The focus on
+computational efficiency in <a href="#ref-6" style="color: blue; text-decoration: none;">[6]</a> and <a href="#ref-9" style="color: blue; text-decoration: none;">[9]</a> is also present in the current work, though
+a different approach is taken.</p>
+<p>The choice of <span class="math inline">\(L^p\)</span> distance as a
+metric to optimize for in the current paper was chosen after careful
+review of existing literature. One natural way to measure the distance
+between two distributions is in terms of optimal transport, which can be
+thought of as a measure of the minimal effort necessary to transform one
+distribution into another. A particular measure of optimal transport
+distance is the Wasserstein distance <a href="#ref-13" style="color: blue; text-decoration: none;">[13]</a>, formulated as <span class="math display">\[W_p(\mu, \nu) = \inf_{\gamma \in \Gamma(\mu,
+\nu)} \biggl(\int_{\mathcal{X} \times \mathcal{X}} ||x - y||^p
+d\gamma(x,y)\biggr)^{\frac{1}{p}}\]</span> Where <span class="math inline">\(\Gamma\)</span> is the set of couplings on <span class="math inline">\(\mathcal{X} \times \mathcal{X}\)</span>. When
+<span class="math inline">\(p = 1\)</span>, the Wasserstein distance is
+illustratively referred to as the "Earth-Mover’s Distance", and is an
+intuitive and commonly used distance metric between two distributions.
+The difference between the Wasserstein distance and the <span class="math inline">\(L^p\)</span> distance is that the Wasserstein
+distance involves finding an optimal coupling between two distributions,
+often achieved through techniques such as linear programming. This
+inherent optimization process involved in Wasserstein distance makes
+optimizing for the Wasserstein distance itself cumbersome as the
+distance does not necessarily have a closed form. Beyond having an
+intuitive explanation in terms of optimal transport theory, the <span class="math inline">\(L^p\)</span> distance also benefits from a great
+deal of flexibility based on the choice of <span class="math inline">\(p\)</span>. Higher values of <span class="math inline">\(p\)</span> will lead to greater sensitivity to
+outliers in either distribution, useful for assessing worst-case
+deviations such as in risk-management applications, whereas lower values
+of <span class="math inline">\(p\)</span> will have lower sensitivity to
+these outliers and has applications in domains such as image processing
+and machine learning <a href="#ref-14" style="color: blue; text-decoration: none;">[14]</a>.</p>
+<p>As described in the previous section, QMC integration is an important
+use case for optimal sampling, and has been explored thoroughly by
+Morokoff and Caflisch in <a href="#ref-2" style="color: blue; text-decoration: none;">[2]</a>. This work focuses on the use of
+low-discrepancy infinite sequences- namely the Sobol, Halton, and Faure
+sequences as the source for samples to use to integrate functions. The
+<span class="math inline">\(n\)</span>th number in the Halton sequence
+is calculated as follows: <span class="math display">\[z_n =
+\frac{a_0}{p} +
+\frac{a_1}{p^2}+\frac{a_2}{p^3}+...+\frac{a_m}{p^{m+1}}\]</span> Where
+<span class="math inline">\(p\)</span> is some prime and the <span class="math inline">\(a_i\)</span>s are integers taken from the base
+<span class="math inline">\(p\)</span> expansion of <span class="math inline">\(n-1\)</span>. Sobol’s sequence and Faure’s
+sequence build upon Halton’s sequence but maintain a similar basic
+principle. These sequences are intended to fill a unit hypercube of
+dimension <span class="math inline">\(d\)</span> <span class="math inline">\([0,1]^d\)</span> in a more uniform manner than
+pure random sampling. In <a href="#ref-2" style="color: blue; text-decoration: none;">[2]</a>, it is pointed out that low-discrepancy
+sequences are a better option than, for example, a grid across the
+entire space, because in higher dimensions the number of points in a
+grid grows exponentially, making it infeasible for high dimensions.
+Experimentally, <a href="#ref-2" style="color: blue; text-decoration: none;">[2]</a>
+demonstrates that QMC is superior to MC by several metrics. Notably, the
+low-discrepancy sequences used in <a href="#ref-2" style="color: blue; text-decoration: none;">[2]</a> are able to sample from infinitely many
+dimensions in order to sample from complex distributions, but do not
+provide strict guarantees of optimality, though they do provide upper
+and lower discrepancy bounds. The work in this paper provides a method
+for sampling in 1 dimension which is guaranteed optimality in <span class="math inline">\(L^p\)</span>-distance.</p>
+<h1 class="unnumbered" id="methods">Methods</h1>
+<h2 class="unnumbered" id="theoretically-optimal-samples">Theoretically
+optimal samples</h2>
+<p>Finding the optimal <span class="math inline">\(n\)</span> samples to
+minimise the <span class="math inline">\(L^p\)</span> distance between
+the CDF of an empirical distribution and the CDF of a continuous
+distribution means finding the optimal location for each sample. This
+was approached as an optimization problem, by expressing the distance
+between the empirical and continuous distribution as a function of the
+placement of <span class="math inline">\(n\)</span> samples, then
+setting the derivative of this function to 0 and solving for the
+location of each sample. First, the result of optimal samples is found
+on the Uniform case.</p>
+<div class="theorem">
+<p>To minimise the <span class="math inline">\(L^p\)</span> distance
+between the CDF of an empirical distribution of <span class="math inline">\(n\)</span> samples <span class="math inline">\(\{x_1, x_2, ..., x_n\}\)</span> on the uniform
+<span class="math inline">\([0,1]\)</span> interval and the uniform CDF,
+each sample should be spaced <span class="math inline">\(\frac{1}{n}\)</span> apart, and each <span class="math inline">\(x_i = \frac{2i-1}{2n}\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Assume we have <span class="math inline">\(n\)</span>
+samples <span class="math inline">\(\{x_1, x_2, ... , x_n\} \in
+[0,1]^n\)</span> and that the samples are ordered such that <span class="math inline">\(x_i \leq x_{i+1}, 1 \leq i \leq n-1\)</span>. We
+want to find the set of such samples that the distance between the
+empirical CDF of the samples <span class="math inline">\(\hat{F}\)</span> is the minimal <span class="math inline">\(L^p\)</span> distance from the CDF <span class="math inline">\(F\)</span> of the uniform distribution, where the
+<span class="math inline">\(L^p\)</span> distance is defined as <span class="math display">\[\left(\int_0^1|\hat{F}(x) - F(x)|^p
+dx\right)^{\frac{1}{p}}\]</span> As such, we want to find <span class="math display">\[\underset{x_1, ... , x_n}{\operatorname{arg min}}
+\left(\int_0^1|\hat{F}(x) - F(x)|^p dx\right)^{\frac{1}{p}}\]</span>
+where <span class="math inline">\(\hat{F}(x) = \frac{1}{n} \sum^n_{i=1}
+\mathbf{1}_{[0,x_i]}(x)\)</span> and <span class="math inline">\(F(x) =
+x\)</span> . The empirical distribution is piecewise constant on each
+interval <span class="math inline">\([x_i, x_i+1)\)</span> with value
+<span class="math inline">\(\frac{i}{n}\)</span></p>
+<p>We take the derivative and set to 0 to find the minimum <span class="math display">\[\begin{aligned}
+\frac{\partial}{\partial x_i}\biggl(\int_0^1|\hat{F}(x) - F(x)|^p
+dx\biggr)^{\frac{1}{p}}
+\end{aligned}\]</span> <span class="math display">\[\begin{aligned}
+= &amp;\frac{\partial}{\partial x_i} \biggl(\int_0^{x_1}|\hat{F}(x) -
+F(x)|^p dx + \\&amp;\sum_{i=1}^{n-1}\int_{x_i}^{x_i+1} |\hat{F}(x) -
+F(x)|^p dx + \\&amp;\int_{x_{n}}^1|\hat{F}(x) - F(x)|^p
+dx\biggr)^{\frac{1}{p}}
+\\= &amp;\frac{\partial}{\partial x_i} \biggl(\int_0^{x_1}|- x|^p dx+
+\sum_{i=1}^{n-1}\int_{x_I}^{x_i+1} \left|\frac{i}{n} - x\right|^p dx +
+\\&amp;\int_{x_{n}}^1|1 - x|^p dx\biggr)^{\frac{1}{p}}
+\end{aligned}\]</span> <span class="math display">\[\begin{aligned}
+= &amp;\frac{\partial}{\partial x_i} \biggl(\int_0^{x_1}|- x|^p dx+
+\sum_{i=1}^{n-1}\int_{x_I}^{x_i+1} \left|\frac{i}{n} - x\right|^p dx +
+\\&amp; \int_{x_{n}}^1|1 - x|^p dx\biggr) \\
+&amp;\cdot \frac{1}{p} \biggl(\int_0^{x_1}|- x|^p dx+
+\sum_{i=1}^{n-1}\int_{x_i}^{x_i+1} \left|\frac{i}{n} - x\right|^p dx +
+\\&amp; \int_{x_{n}}^1|1 - x|^p dx\biggr)^{\frac{1-p}{p}}
+\end{aligned}\]</span> Which can be represented as a product of two
+functions <span class="math inline">\(f_1\cdot f_2=0\)</span>, meaning
+at least one of <span class="math inline">\(f_1, f_2\)</span> must equal
+0. We focus on <span class="math inline">\(f_1\)</span> and setting it
+to 0. Taking the derivative of each part of the equation using Leibniz
+Rule, we get <span class="math display">\[\begin{aligned}
+&amp;\frac{\partial}{\partial x_i} \int_0^{x_1}|-x|^pdx =
+\\&amp;\begin{cases}
+x_1^p &amp;i = 1 \\
+0  &amp;i \neq 1
+\end{cases}\\
+&amp;\frac{\partial}{\partial x_i} \sum_{i=1}^{n-1}\int_{x_i}^{x_{i+1}}
+\left|\frac{i}{n} - x\right|^p dx =
+\\&amp;\begin{cases}\left|\frac{i-1}{n} - x_{i}\right|^p -
+\left|\frac{i}{n} - x_{i}\right|^p&amp;2\leq i &lt; n \\
+- \left|\frac{1}{n} - x_{1}\right|^p &amp;i = 1 \\
+\left|\frac{n-1}{n} - x_{n}\right|^p &amp;i = n
+\end{cases}\\
+&amp;\frac{\partial}{\partial x_i} \int^1_{x_n}|1-x|^p dx =
+\\&amp;\begin{cases}
+-|1-x_n|^p &amp;i = n \\
+0 &amp;i \neq n
+\end{cases}
+\end{aligned}\]</span> Which gives us three cases: <span class="math inline">\(i = 1, 2 \leq i &lt; n, i = n\)</span></p>
+<p><span class="math display">\[\begin{cases}
+x_1^p - \left|\frac{1}{n} - x_1\right|^p &amp;i = 1 \\
+\left|\frac{i-1}{n} - x_i\right|^p - \left|\frac{i}{n} - x_i\right|^p
+&amp;2 \leq i &lt; n \\
+\left|\frac{n-1}{n} - x_n\right|^p - |1 - x_n|^p &amp;i = n
+\end{cases}\]</span> Setting each to 0, we have <span class="math display">\[\begin{cases}
+x_1 = \frac{1}{2n} &amp;i = 1\\
+x_i = \frac{2i-1}{2n} &amp;2 \leq i &lt; n \\
+x_n = \frac{2n-1}{2n} &amp; i = n
+\end{cases}\]</span> So for every <span class="math inline">\(i\)</span>, <span class="math inline">\(x_i =
+\frac{2i-1}{2n}\)</span> and equivalently the distance between any two
+samples is <span class="math inline">\(\frac{1}{n}\)</span> ◻</p>
+</div>
+<p>After the uniform case, the theorem is broadened to include all
+distributions which include inverse transform sampling.<br />
+</p>
+<div class="theorem">
+<p>The <span class="math inline">\(L^p\)</span> optimal samples on the
+uniform interval <span class="math inline">\([0,1]\)</span>, when passed
+through the inverse transform function, will produce the optimal samples
+on any continuous target distribution</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Assume we have <span class="math inline">\(n\)</span>
+samples <span class="math inline">\(\{x_1, ..., x_n\}\)</span> on the
+interval <span class="math inline">\([0,1]\)</span> and a known inverse
+CDF <span class="math inline">\(G^{-1}\)</span> of a continuous target
+distribution <span class="math inline">\(G\)</span> on <span class="math inline">\(\mathbb{R}\)</span>. We note <span class="math inline">\(y_i = G^{-1}(x_i)\)</span>, and given that <span class="math inline">\(G^{-1}\)</span> is monotone then ordered samples
+<span class="math inline">\(\{x_1, ..., x_n\}\)</span> on the interval
+<span class="math inline">\([0,1]\)</span> produce ordered samples <span class="math inline">\(\{y_1, ..., y_n\}\)</span> on <span class="math inline">\(\mathbb{R}\)</span>. <span class="math inline">\(\hat{G}\)</span> is the empirical CDF defined by
+the samples <span class="math inline">\(\{y_1, ..., y_n\}\)</span>,
+<span class="math inline">\(\hat{G}(y) = \frac{1}{n} \sum^n_{i=1}
+\mathbf{1}_{[-\infty,y_i]}(y)\)</span>. <span class="math inline">\(\hat{G}\)</span> is piecewise constant on the
+interval <span class="math inline">\([y_i, y_{i+1})\)</span> where it
+takes the value <span class="math inline">\(\frac{i}{n}\)</span>.</p>
+<p>We are again looking for the selection of samples <span class="math inline">\(\{x_1, ..., x_n\}\)</span> such that the <span class="math inline">\(L^p\)</span> distance between the CDF of the
+empirical distribution <span class="math inline">\(\hat{G}\)</span> and
+the CDF of the target distribution <span class="math inline">\(G\)</span> is minimised. <span class="math display">\[\underset{x_1, ... , x_n}{\operatorname{arg min}}
+\left(\int_0^1|\hat{G}(t) - G(t)|^pdt\right)^{\frac{1}{p}}\]</span>
+Taking the derivative, setting the derivative to 0, and simplifying as
+in the previous proof, we have <span class="math display">\[\frac{\partial}{\partial x_i} \int_0^1
+\left|\hat{G}(t) - G(t)\right|^p dt\]</span> <span class="math display">\[\begin{aligned}
+= &amp; \frac{\partial}{\partial x_i}
+\biggl(\int_{-\infty}^{y_1}|\hat{G}(t) - G(t)|^p dt+
+\\&amp;\sum_{i=1}^{n-1}\int_{y_i}^{y_i+1} |\hat{G}(t) - G(t)|^p dt +
+\\&amp;\int_{y_{n}}^\infty|\hat{G}(t) - G(t)|^p dt\biggr)^{\frac{1}{p}}
+= 0
+\end{aligned}\]</span></p>
+<p><span class="math display">\[\begin{aligned}
+\implies &amp;\frac{\partial}{\partial x_i}
+\biggl(\int_{-\infty}^{G^{-1}(x_1)}|- G(t)|^p dt+ \\
+&amp;\sum_{i=1}^{n-1}\int_{G^{-1}(x_i)}^{G^{-1}(x_{i+1})}
+\left|\frac{i}{n} - G(t)\right|^p dt +
+\\&amp;\int_{G^{-1}(x_{n})}^\infty|1 - G(t)|^p dt\biggr)=0
+\end{aligned}\]</span></p>
+<p>Performing the substitution <span class="math inline">\(t =
+G^{-1}(x)\)</span> we get <span class="math display">\[\begin{aligned}
+&amp;\frac{\partial}{\partial x_i} \biggl(\int_{0}^{x_1}|- x|^p
+\frac{d}{dx} G^{-1}(x)dx+ \\
+&amp;\sum_{i=1}^{n-1}\int_{G^{-1}(x_i)}^{G^{-1}(x_{i+1})}
+\left|\frac{i}{n} - x\right|^p  \frac{d}{dx} G^{-1}(x)dx+ \\
+&amp;\int_{G^{-1}(x_{n})}^\infty|1 - x|^p \frac{d}{dx}
+G^{-1}(x)dx\biggr) = 0
+\end{aligned}\]</span> Which can be broken down and analysed in parts
+<span class="math display">\[\begin{aligned}
+&amp;\frac{\partial}{\partial x_i} \int_0^{x_1}|-x|^p \frac{d}{dx}
+G^{-1}(x)dx = \\&amp;\begin{cases}
+x_1^p \frac{d}{dx_1} G^{-1}(x_1)&amp;i = 1 \\
+0  &amp;i \neq 1
+\end{cases}\\
+&amp;\frac{\partial}{\partial x_i} \sum_{i=1}^{n-1}\int_{x_i}^{x_{i+1}}
+\left|\frac{i}{n} - x\right|^p \frac{d}{dx} G^{-1}(x) dx =
+\\&amp;\begin{cases}\frac{d}{dx_i} G^{-1}(x_i)(\left|\frac{i}{n} -
+x_{i}\right|^p - \left|\frac{i+1}{n} - x_{i}\right|^p)&amp;2\leq i &lt;
+n \\
+- \left|\frac{1}{n} - x_{1}\right|^p\frac{d}{dx_1} G^{-1}(x_1) &amp;i =
+1 \\
+\left|\frac{n-1}{n} - x_{n}\right|^p \frac{d}{dx_n} G^{-1}(x_n) &amp;i =
+n
+\end{cases}\\
+&amp;\frac{\partial}{\partial x_i} \int^1_{x_n}|1-x|^p \frac{d}{dx}
+G^{-1}(x) dx =
+\\&amp;\begin{cases}
+-|1-x_n|^p \frac{d}{dx_n} G^{-1}(x_n) &amp;i = n \\
+0 &amp;i \neq n
+\end{cases}
+\end{aligned}\]</span> This gives us three distinct cases, <span class="math inline">\(i = 1, 2 \leq i &lt; n, i = n\)</span> <span class="math display">\[\begin{cases}
+\frac{d}{dx_1} G^{-1}(x_1) (x_1^p - \left|\frac{1}{n} - x_1\right|^p)
+&amp;i = 1 \\
+\frac{d}{dx_i} G^{-1}(x_i)(\left|\frac{i}{n} - x_i\right|^p -
+\left|\frac{i+1}{n} - x_i\right|^p) &amp;2 \leq i &lt; n \\
+\frac{d}{dx_n} G^{-1}(x_n)(\left|\frac{n-1}{n} - x_n\right|^p - |1 -
+x_n|^p) &amp;i = n
+\end{cases}\]</span> Setting each to 0, we can disregard the <span class="math inline">\(\frac{d}{dx} G^{-1}(x)\)</span> term in each case
+as they are each multiplied by a second term. Solving each case for 0,
+we get <span class="math display">\[\begin{cases}
+x_1 = \frac{1}{2n} &amp;i = 1\\
+x_i = \frac{2i-1}{2n} &amp;2 \leq i &lt; n \\
+x_n = \frac{2n-1}{2n} &amp; i = n
+\end{cases}\]</span> So, in each case, when using the uniform
+distribution as with the inverse transform, for every <span class="math inline">\(i\)</span>, <span class="math inline">\(x_i =
+\frac{2i-1}{2n}\)</span> and equivalently the distance between any two
+samples is <span class="math inline">\(\frac{1}{n}\)</span> ◻</p>
+</div>
+<p>The above two theorems show that the sample placement of <span class="math inline">\(x_i = \frac{2i-1}{2n}\)</span> is an optimum (i.e
+a place where the derivative is 0), but they do not show that this is
+the singular best placement for the samples. To do so, it is necessary
+to prove that the function of the <span class="math inline">\(L^p\)</span> distance between the CDF of the
+empirical and continuous distributions is convex in <span class="math inline">\(x_i\)</span>, where <span class="math inline">\(x_i\)</span> are the samples in the empirical
+distribution. To prove this it is necessary to first prove that the set
+of ordered subsets of <span class="math inline">\(\mathbb{R}\)</span> is
+convex.<br />
+Let <span class="math inline">\(D \in \mathbb{R}\)</span> be the subset
+of ordered <span class="math inline">\(n\)</span>-tuples such that <span class="math inline">\(\{x_1, ..., x_n\} \in D \implies \{x_1, ..., x_n\}
+\in \mathbb{R}^n \land x_1 \leq x_2 \leq ... \leq x_n\)</span><br />
+<br />
+</p>
+<div class="lemma">
+<p>D is convex</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Let <span class="math inline">\(\{x_1, ...,
+x_n\},\{y_1, ..., y_n\} \in D\)</span> and <span class="math inline">\(t
+\in [0,1]\)</span>. Since both sets are ordered, and addition and
+multiplication by a positive real are monotone, it follows that <span class="math display">\[tx_i + (1-t)y_i \leq tx_{i+1} +
+(1-t)y_{i+1}\]</span> From this it follows that <span class="math display">\[t(x_1, ..., x_n) + (1-t)(y_1, ..., y_n) \in
+D\]</span> ◻</p>
+</div>
+<p>We consider the <span class="math inline">\(L^p\)</span> distance
+between any monotonically increasing function <span class="math inline">\(G\)</span> and an empirical CDF (as defined in
+theorems 1 and 2) <span class="math inline">\(\hat{G}\)</span> as a
+function <span class="math inline">\(F: D \rightarrow
+\mathbb{R}\)</span></p>
+<p><span class="math display">\[\begin{aligned}
+L^p(x_1, ..., x_n) = &amp;\biggl(\int_{-\infty}^{x_1}|\hat{G}(x) -
+G(x)|^p dx+ \\&amp;\sum_{i=1}^{n-1}\int_{x_i}^{x_i+1} |\hat{G}(x) -
+G(x)|^p dx + \\&amp;\int_{x_{n}}^{\infty}|\hat{G}(x) - G(x)|^p
+dx\biggr)^{\frac{1}{p}}
+\end{aligned}\]</span></p>
+<p>To prove the convexity of a univariate function, it is necessary to
+prove that the second derivative of the function is positive everywhere
+<a href="#ref-15" style="color: blue; text-decoration: none;">[15]</a></p>
+<div class="proposition">
+<p>The <span class="math inline">\(L^p\)</span> distance between a
+continuous CDF function <span class="math inline">\(G\)</span> and an
+empirical CDF <span class="math inline">\(\hat{G}\)</span> defined on
+samples <span class="math inline">\(x_i\)</span> is convex in <span class="math inline">\(x_i\)</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> For ease of labelling, we will consider the <span class="math inline">\(L^p\)</span> distance as the function <span class="math display">\[L^p(x_1, ..., x_n) =
+(f(x_1,...,x_n))^{\frac{1}{p}}\]</span> Where <span class="math display">\[\begin{aligned}
+f(x_1, .., x_n) = &amp;\int_{-\infty}^{x_1}|\hat{G}(x) - G(x)|^p dx +
+\\&amp;\sum_{i=1}^{n-1}\int_{x_i}^{x_i+1} |\hat{G}(x) - G(x)|^p dx +
+\\&amp;\int_{x_{n}}^{\infty}|\hat{G}(x) - G(x)|^p dx
+\end{aligned}\]</span> As <span class="math inline">\((u)^{\frac{1}{p}}\)</span> is monotone for all
+<span class="math inline">\(p &gt; 0, u &gt; 0\)</span>, and <span class="math inline">\(f(x_1, ..., x_n)\)</span> is always positive as it
+is a sum of positive values, if <span class="math inline">\(f(x_1, ...,
+x_n) &lt; f(y_1, ..., y_n)\)</span> for all <span class="math inline">\(y \neq x\)</span>, then <span class="math inline">\((f(x_1, ..., x_n))^{\frac{1}{p}} &lt; (f(y_1, ...,
+y_n))^{\frac{1}{p}}\)</span> for all <span class="math inline">\(p &gt;
+0\)</span>. Therefore, it is only necessary to prove the convexity of
+<span class="math inline">\(f(x_1, ..., x_n)\)</span> to prove the
+convexity of <span class="math inline">\((f(x_1, ...,
+x_n))^{\frac{1}{p}}\)</span></p>
+<p>In theorems 1 and 2 it is shown through the application of Leibniz
+Rule that the first derivative of <span class="math inline">\(f(x_1,...,x_n)\)</span> is <span class="math display">\[\frac{\partial}{\partial x_i} f(x_1,...,x_n) =
+\biggl|\frac{i-1}{n}-G(x)\biggr|^p
+-\biggl|\frac{i}{n}-G(x)\biggr|^p\]</span> Taking the derivative of this
+to get the second derivative, we get <span class="math display">\[\begin{aligned}
+&amp;\frac{\partial^2}{\partial^2 x_i} f(x_1,...,x_n) = \\&amp;p \cdot
+\frac{dG(x_i)}{x_i} \cdot\biggl(\biggl|\frac{i-1}{n}-G(x)\biggr|^{p-1}
+-\biggl|\frac{i}{n}-G(x)\biggr|^{p-1}\biggr)
+\end{aligned}\]</span></p>
+<p><span class="math inline">\(p\)</span> is positive for any <span class="math inline">\(L^p\)</span> distance, and <span class="math inline">\(\frac{dG(x_i)}{x_i}\)</span> is always positive as
+<span class="math inline">\(G(x_i)\)</span> is a monotone function. As
+<span class="math inline">\(i, n \in \mathbb{Z}^+ \land i &lt;
+n\)</span> , <span class="math display">\[\biggl(\biggl|\frac{i-1}{n}-G(x)\biggr|^{p-1}
+-\biggl|\frac{i}{n}-G(x)\biggr|^{p-1}\biggr) \geq 0\]</span> Therefore,
+<span class="math inline">\(\frac{\partial^2}{\partial^2 x_i}
+f(x_1,...,x_n)\)</span> is positive, meaning <span class="math inline">\(f(x_1, ..., x_n)\)</span> is convex, and so is
+<span class="math inline">\((f(x_1, ..., x_n))^{\frac{1}{p}}\)</span>
+for all <span class="math inline">\(p &gt; 0\)</span> ◻</p>
+</div>
+<h2 class="unnumbered" id="practical-optimal-samples">Practical optimal
+samples</h2>
+<p>To implement this optimal sampling strategy on a real computer, it is
+necessary to account for the practical implementation of this method. To
+represent fractional numbers, the two most common data formats are
+single precision floats (32 bits long in total) and double precision
+floats (64 bits long in total). With floating point numbers, error is
+introduced in representation as some fractions cannot be precisely
+represented in floating point binary (though all fractions with a
+denominator which is a power of 2 can be represented exactly using
+floating point format). It is important to calculate the upper limits on
+how many samples can be calculated with a given degree of accuracy.</p>
+<div class="proposition">
+<p>Let <span class="math inline">\(\{x_1,...,x_n\}\)</span> be the set
+of <span class="math inline">\(n\)</span> optimal samples on the <span class="math inline">\([0,1]\)</span> interval and <span class="math inline">\(\{y_1,...,y_n\}\)</span> be the corresponding set
+of floating point values representing the samples. Then setting the
+cumulative representation error <span class="math display">\[err =
+\sum_{i=1}^n |x_i - y_i|\]</span> and bounding the total cumulative
+error at <span class="math display">\[err \leq |x_i - x_{i+1}|\]</span>
+in the worst case we can produce 2896 optimal samples on the <span class="math inline">\([0,1]\)</span> interval using single precision
+floating point format and 67108864 optimal samples using double
+precision floating point format.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> A floating point number is represented as <span class="math display">\[(\text{Sign}\cdot-1) \cdot
+\text{(exponent)}^2\cdot\text{(mantissa)}^2\]</span> As described above,
+any set of optimal samples is on the <span class="math inline">\([0,1]\)</span> interval, meaning exponent and sign
+will be the same for all samples. As such we consider only the mantissa.
+In order for sampling on the uniform distribution to work at suitable
+precision, it is necessary for the samples to be distinguishable from
+one another, meaning that the distance between each sample <span class="math inline">\(\epsilon\)</span> must be able to be represented
+in a bit string of the given length. In theorems 1 and 2 it was proven
+that the optimal <span class="math inline">\(\epsilon =
+\frac{1}{n}\)</span> where <span class="math inline">\(n\)</span> is the
+number of samples. To determine the necessary length of the bit string
+<span class="math inline">\(b\)</span>, it is necessary to find the
+power of two such that <span class="math inline">\(\frac{1}{2^b}\)</span> gives the necessary
+precision. <span class="math display">\[b=inf\left\{ x \in \mathbb{R}
+\biggl| \frac{1}{2^x} \leq \frac{1}{n} \right\} \approx
+\log_2(n)\]</span> Single precision floats have 23 bits in the mantissa,
+meaning <span class="math display">\[23 = \log_2(n) \implies n =
+8388608\]</span> So a single precision format can represent any power of
+two up to 8388608 optimal samples with no loss of precision. Similarly,
+a double precision float format has 52 bits in the mantissa, meaning
+<span class="math display">\[52 = \log_2(n) \implies n =
+4503599627370496\]</span> However, for any <span class="math inline">\(n\)</span> which is not a power of two, the
+cumulative error in the distribution is easily calculable as the sum of
+errors on individual samples, using the <span class="math inline">\(e_{machine}\)</span> value for both double and
+single precision floats. <span class="math inline">\(e_{machine}\)</span> is the difference between 1
+and the smallest floating point number larger than 1 in each floating
+point format, and is the greatest possible representation error for a
+single sample. For single precision <span class="math inline">\(e_{machine} = 2^{-23}\)</span> and for double
+precision <span class="math inline">\(e_{machine} = 2^{-52}\)</span> .
+In both cases, the formula for worst case cumulative error over <span class="math inline">\(n\)</span> samples is <span class="math display">\[err = n \cdot e_{machine}\]</span> If we add the
+restriction that the cumulative error should never be greater than the
+distance between two adjacent samples, we get <span class="math display">\[\begin{aligned}
+&amp;\epsilon = err = n\cdot e_{machine}\\
+\implies&amp;\frac{1}{n} = n \cdot e_{machine}\\
+\implies &amp;n = \sqrt\frac{1}{e_{machine}}
+\end{aligned}\]</span> Therefore in the worst case, when ensuring that
+the cumulative error is less than the distance between 2 adjacent
+samples, the total number of samples which can be generated on the
+uniform using single precision floats is 2896, whereas the total number
+of samples which can be generated using double precision floats is
+67108864. ◻</p>
+</div>
+<h1 class="unnumbered" id="experiments-and-results">Experiments and
+Results</h1>
+<p>After the theoretical proof of optimal sampling described above, it
+is necessary to include experimental results to demonstrate this
+optimality.</p>
+<h2 class="unnumbered" id="inverse-transform-sampling-optimal-vs-random">Inverse transform
+sampling: Optimal vs Random</h2>
+<p>This experiment compares the optimally selected samples (i.e samples
+on the uniform distribution where <span class="math inline">\(x_i =
+\frac{2i-1}{2n}\)</span> where <span class="math inline">\(n\)</span> is
+the number of samples) on the <span class="math inline">\([0,1]\)</span>
+interval with randomly selected samples on the <span class="math inline">\([0,1]\)</span> interval using the numpy <a href="#ref-16" style="color: blue; text-decoration: none;">[16]</a> library’s
+<code>np.rand</code> function. A target distribution was defined using
+<code>scipy.stats.norm</code> <a href="#ref-17" style="color: blue; text-decoration: none;">[17]</a> with a mean of 0 and standard deviation of 1.
+The quantile function for this target distribution was approximated
+using scipy’s <code>norm.ppf</code> function, and both the optimal and
+random samples were passed through this quantile function to transform
+them into samples from the target distribution. The <span class="math inline">\(L^p\)</span> distance (in this case, <span class="math inline">\(L^2\)</span>) defined above in this paper was then
+used to determine the distance between the empirical distributions of
+the inverse transform samples and the analytical distribution of the
+<code>norm</code>. For the integration necessary for calculation of the
+<span class="math inline">\(L^2\)</span> distance, scipy’s
+<code>integrate.quad</code> function was used. For every value <span class="math inline">\(n\)</span> between 1 and 100, <span class="math inline">\(n\)</span> samples were drawn from the uniform
+distribution using either the optimal method or the random method and
+used as input for the inverse transform, with the <span class="math inline">\(L^2\)</span> distance graphed below alongside the
+number of samples. As can be seen, the optimal sampling method
+outperforms random sampling for all <span class="math inline">\(n\)</span>, and converges to a lower distance much
+faster than random sampling.</p>
+<figure id="fig:example">
+<img src="images/optimal_samples_vs_random_samples.png" />
+<figcaption>Optimal samples vs Random samples, <span class="math inline">\(L^2\)</span> distance in inverse
+transform</figcaption>
+</figure>
+<h2 class="unnumbered" id="approximating-pi-sobol-sequence-vs-optimal-sampling">Approximating
+<span class="math inline">\(\pi\)</span>: Sobol Sequence vs Optimal
+Sampling</h2>
+<p><span class="math inline">\(\pi\)</span> can be represented as the
+integral : <span class="math display">\[\int_0^1
+\frac{x^4(1-x)^4}{1+x^2} dx = \frac{22}{7}-\pi\]</span> <a href="#ref-18" style="color: blue; text-decoration: none;">[18]</a> As this integral is
+over the <span class="math inline">\([0,1]\)</span> interval, it
+provides another opportunity to test the optimal sampling method
+described herein. This integral can be calculated via Quasi Monte-Carlo
+<a href="#ref-2" style="color: blue; text-decoration: none;">[2]</a> integration as
+described earlier. Another deterministic approach to sampling on the
+<span class="math inline">\([0,1]\)</span> interval is the Sobol
+sequence <a href="#ref-19" style="color: blue; text-decoration: none;">[19]</a>
+which uses deterministic sampling based on bitwise operations to
+distribute samples evenly on the <span class="math inline">\([0,1]\)</span> interval. This experiment used QMC
+integration to calculate <span class="math inline">\(\pi\)</span> using
+<span class="math inline">\(n\)</span> optimal samples compared to the
+<span class="math inline">\(n\)</span> samples of a one dimensional
+Sobol sequence and monte-carlo integration using <span class="math inline">\(n\)</span> random samples using
+<code>np.rand</code>. The number of digits to which the approximation of
+<span class="math inline">\(\pi\)</span> is accurate is plotted below,
+as a function of the number of samples. Note that, as a 64 bit floating
+point is used to represent <span class="math inline">\(\pi\)</span> in
+the following experiment, the maximum achievable accuracy for any method
+is 16 decimal places. As can be seen, the optimal samples provide the
+highest degree of accuracy with the smallest number of samples,
+providing an approximation of <span class="math inline">\(\pi\)</span>
+accurate to 15 digits using only 200 samples on the <span class="math inline">\([0,1]\)</span> interval. Due to the bitwise nature
+of Sobol sequence calculation, when <span class="math inline">\(n\)</span> is a power of 2 the accuracy of the QMC
+integration using Sobol sequence experiences is high in accuracy, but
+optimal sampling still performs equal to or better than the Sobol
+sequence in these instances. For numbers of samples which are not a
+power of 2, the Sobol sequence displays inconsistent performance that is
+generally worse than optimal samples. This demonstrates the utility of
+the optimal sampling method for quasi monte-carlo integration.</p>
+<figure id="fig:example">
+<img src="images/mc_integration_pi.png" />
+<figcaption>Optimal samples vs Sobol samples vs Random samples, accuracy
+in <span class="math inline">\(\pi\)</span> integration</figcaption>
+</figure>
+<h2 class="unnumbered" id="approximating-eulers-constant-gamma-halton-sequence-vs-optimal-samples">Approximating
+Euler’s Constant <span class="math inline">\(\gamma\)</span>: Halton
+Sequence vs Optimal Samples</h2>
+<p>Euler’s constant <span class="math inline">\(\gamma\)</span> can be
+represented by the integral <a href="#ref-20" style="color: blue; text-decoration: none;">[20]</a> <span class="math display">\[\int_{0}^{1} \left( \frac{1}{\log x} + \frac{1}{1
+- x} \right) dx\]</span> Again, as this integral is over the <span class="math inline">\([0,1]\)</span> interval, optimal sampling is a
+suitable method for QMC integration. As described earlier, the Halton
+sequence is another low-discrepancy sequence used for QMC integration
+similar to the Sobol sequence. As such, for this test optimal sampling
+and the Halton sequence were compared in calculating <span class="math inline">\(\gamma\)</span> using QMC integration. As with the
+above experiment, the metric used was number of digits of accuracy (not
+including the leading 0) compared to number of samples used for the
+calculation. As can be seen, the optimal samples outperforms Halton
+sequence. However, unlike the previous experiment, the performance of
+the Halton sequence is more stable in one dimension than the Sobol
+sequence.</p>
+<figure id="fig:example">
+<img src="images/mc_integration_gamma.png" />
+<figcaption>Optimal samples vs Halton samples, accuracy in <span class="math inline">\(\gamma\)</span> integration</figcaption>
+</figure>
+<h2 class="unnumbered" id="optimal-samples-as-input-for-more-complex-distributions-box-muller">Optimal
+Samples as input for more complex distributions: Box Muller</h2>
+<p>This paper does not propose a method for optimal sampling of
+multivariate distributions. However, sampling from multivariate
+distributions is an important task in computational statistics. It is
+therefore pertinent to discuss whether the optimal sampling method in
+one dimension can be used as an input or basis for sampling in multiple
+dimensions. The <em>Box-Muller transform</em> <a href="#ref-21" style="color: blue; text-decoration: none;">[21]</a> is a commonly used method for
+transforming uniform samples to samples from a normal distribution, as
+the normal distribution lacks an analytical form quantile function,
+precluding inverse transform sampling. Box-Muller is commonly used for
+the production of a one-dimensional normal distribution, but can be
+extended to higher dimensions to take sets of uniform samples as input
+and produce a multivariate normal distribution as output. For this
+experiment, we use the optimal sampling technique to create two sets of
+<span class="math inline">\(n\)</span> samples, and take the Cartesian
+product of the two sets to create a set of 2-dimensional uniform
+samples. This set of 2-dimensional uniform samples is then transformed
+to a 2-dimensional normal distribution using Box-Muller. We use
+<em>kernel density estimation</em> <a href="#ref-22" style="color: blue; text-decoration: none;">[22]</a> to approximate a continuous version of the
+discrete distribution created by placing a Gaussian kernel centred at
+each sample. We then evaluate the distribution over a grid and calculate
+the Kulback-Liebler Divergence <a href="#ref-23" style="color: blue; text-decoration: none;">[23]</a> between the KDE of the transformed
+samples and the continuous CDF of a standard normal distribution (mean
+of 0 and identity covariance matrix) using the following formula: <span class="math display">\[\sum_i p(x_i) \log
+\biggl(\frac{p(x_i)}{q(x_i)}\biggr)\]</span> where <span class="math inline">\(x_i\)</span> are locations on the grid, <span class="math inline">\(p(x)\)</span> is the KDE of the empirical
+distribution, and <span class="math inline">\(q(x)\)</span> is the
+continuous distribution. We also calculate the KL Divergence between the
+continuous distribution and the KDE of an empirical distribution of
+points sampled from a standard normal using
+<code>np.random.multivariate_normal</code>. As the optimal sampling
+input to the Box-Muller transform is a Cartesian product of <span class="math inline">\(n \times n\)</span> samples, it was chosen that
+<span class="math inline">\(n=32\)</span> for this experiment, meaning
+there are <span class="math inline">\(32\)</span> 1-dimensional samples
+from the uniform distribution, and therefore 1024 2-dimensional samples
+in the Cartesian product. Therefore, 1024 2-dimensional samples were
+also drawn from <code>np.random.multivariate_normal</code> for
+comparison. The KL divergence of the KDE of the random samples compared
+to the continuous distribution was found to be 0.011, and the KL
+divergence of the KDE of the optimal samples compared to the continuous
+distribution was found to be 0.005.</p>
+<p>Though this is not a rigorous exploration of multivariate sampling,
+the results suggest that optimal one dimensional sampling may have uses
+in more complex processes and may provide an efficient basis for inputs
+to functions such as Box-Muller.</p>
+<figure id="fig:example">
+<img src="images/kde_plot.png" />
+<figcaption>Optimal samples vs Random samples vs Target
+Distribution</figcaption>
+</figure>
+<h1 class="unnumbered" id="conclusions-and-further-work">Conclusions and
+further work</h1>
+<h2 class="unnumbered" id="contributions">Contributions</h2>
+<p>This paper has proven both theoretically and experimentally the <span class="math inline">\(L^p\)</span>-optimality of the sampling method
+proposed for sampling from a 1 dimensional distribution. In particular,
+it has been proven mathematically that for any distribution with a
+closed form quantile function, <span class="math inline">\(x_i =
+\frac{2i-1}{2n}\)</span> are <span class="math inline">\(L^p\)</span>-optimal samples to take on the
+uniform interval <span class="math inline">\([0,1]\)</span> to then
+transform using the quantile function. It has also been shown
+experimentally that for distributions without a closed form quantile
+function (such as the normal distribution) optimal samples on the
+uniform when transformed using an approximate quantile function quickly
+converge to a low <span class="math inline">\(L^p\)</span>-distance from
+the target distribution. Experimentally, the utility of the optimal
+sampling method has also been shown for Quasi Monte-Carlo integration
+techniques with very few samples needing to be calculated. The
+computational complexity of the method provided depends on the quantile
+function used, but scales linearly with the number of samples being
+produced as each sample is subjected to the same process. Additionally,
+well-defined computational limits given existing hardware were
+given.</p>
+<h2 class="unnumbered" id="further-work">Further work</h2>
+<p>The work done in this paper presents questions to be explored in
+further work. One of the most immediate lines of enquiry is if there
+exists an equivalent optimal sampling strategy for multivariate
+probability distributions. However, this question is significantly more
+complex than in the 1 dimensional case, as multivariate quantile
+functions are not well defined, given the lack of total ordering in
+multi-dimensional space. This would mean that a multivariate optimal
+sampling strategy may not be able to utilise inverse transform sampling
+in the same way as the univariate case. Another issue with the
+multivariate case would be a definition of distance, as multivariate
+distributions also contain a <em>copula</em> <a href="#ref-24" style="color: blue; text-decoration: none;">[24]</a> which describes the dependency relations
+between the variables within a distribution. The question of how to
+combine the distance between copulas with the distance between marginals
+of two multivariate distributions then arises.</p>
+<p>Another topic of further research is if the <span class="math inline">\(L^p\)</span> optimality holds where <span class="math inline">\(p = \infty\)</span>, as it has been proven to hold
+for all <span class="math inline">\(p &lt; \infty\)</span>. This would
+require further mathematical work on the problem.</p>
+<p>The final extension to the work presented herein is in applications.
+As shown in the experimental section of this paper, optimal sampling
+provides a strong method for Quasi Monte-Carlo integration with
+relatively few samples. This lack of necessary resources for good
+numerical approximations of integrals potentially lends itself to
+applications where there are relatively few resources available, such as
+edge computing applications. In particular, fast and cheap integral
+calculations are valuable for applications in mechatronics and
+robotics.</p>
+<p>Furthermore, a combination of the optimal sampling method with KDE
+would allow for re-sampling of a distribution for which a PDF or CDF is
+not available. This would potentially allow for a new approach to data
+imputation when samples or variables are missing, which would be useful
+for practical machine learning applications. However, this naturally
+leads back to the first question about the multivariate case, as
+imputation with the current optimal sampling method would only work if
+all variables are assumed to be independent, which is often untrue.</p>
+<div class="thebibliography"><h2>References</h2><ol><li id="ref-1" value="1">Robert, Christian P., et al. "Monte carlo integration." Monte Carlo statistical methods (1999): 71-138.</li><li id="ref-2" value="2">Morokoff, William J., and Russel E. Caflisch. "Quasi-monte carlo integration." Journal of computational physics 122.2 (1995): 218-230.</li><li id="ref-3" value="3">Brooks, Stephen. "Markov chain Monte Carlo method and its application." Journal of the royal statistical society: series D (the Statistician) 47.1 (1998): 69-100.</li><li id="ref-4" value="4">Chib, Siddhartha, and Edward Greenberg. "Understanding the metropolis-hastings algorithm." The american statistician 49.4 (1995): 327-335.</li><li id="ref-5" value="5">Levie, Ron, Haim Avron, and Gitta Kutyniok. "Quasi Monte Carlo time-frequency analysis." Journal of Mathematical Analysis and Applications 518.2 (2023): 126732.</li><li id="ref-6" value="6">Saad, Feras, et al. "The fast loaded dice roller: A near-optimal exact sampler for discrete probability distributions." International Conference on Artificial Intelligence and Statistics. PMLR, 2020.</li><li id="ref-7" value="7">Knuth, Donald. "The complexity of nonuniform random number generation." Algorithm and Complexity, New Directions and Results (1976).</li><li id="ref-8" value="8">Hayes, Brian. "Computing science: Randomness as a resource." American Scientist 89.4 (2001): 300-304.</li><li id="ref-9" value="9">Saad, Feras A., et al. "Optimal approximate sampling from discrete probability distributions." Proceedings of the ACM on Programming Languages 4.POPL (2019): 1-31.</li><li id="ref-10" value="10">Olver, Sheehan, and Alex Townsend. "Fast inverse transform sampling in one and two dimensions." arXiv preprint arXiv:1307.1223 (2013).</li><li id="ref-11" value="11">Benedek, Agnes, and Rafael Panzone. "The space Lp, with mixed norm." (1961): 301-324.</li><li id="ref-12" value="12">Hernandez, Hugo. (2020). Optimal Samples from Selected Probability Distributions. 10.13140/RG.2.2.27628.72327.</li><li id="ref-13" value="13">Panaretos, Victor M., and Yoav Zemel. "Statistical aspects of Wasserstein distances." Annual review of statistics and its application 6.1 (2019): 405-431.</li><li id="ref-14" value="14">Adler, Jonas, and Sebastian Lunz. "Banach wasserstein gan." Advances in neural information processing systems 31 (2018).</li><li id="ref-15" value="15">Rockafellar, R. Tyrrell. "Second-order convex analysis." J. Nonlinear Convex Anal 1.1-16 (1999): 84.</li><li id="ref-16" value="16">Harris, Charles R., et al. "Array programming with NumPy." Nature 585.7825 (2020): 357-362.</li><li id="ref-17" value="17">Virtanen, Pauli, et al. "SciPy 1.0: fundamental algorithms for scientific computing in Python." Nature methods 17.3 (2020): 261-272.</li><li id="ref-18" value="18">Lucas, S. K. "Integral approximations to Pi with nonnegative integrands." American Math. Monthly 116 (2009): 166-172.</li><li id="ref-19" value="19">Burhenne, Sebastian, Dirk Jacob, and Gregor P. Henze. "Sampling based on Sobol'sequences for Monte Carlo techniques applied to building simulations." Building Simulation 2011. Vol. 12. IBPSA, 2011.</li><li id="ref-20" value="20">Wikipedia contributors. (2024, August 22). "Euler's constant. Wikipedia, The Free Encyclopedia."</li><li id="ref-21" value="21">Scott, David W. "Box–muller transformation." Wiley Interdisciplinary Reviews: Computational Statistics 3.2 (2011): 177-179.</li><li id="ref-22" value="22">Weglarczyk, Stanislaw. "Kernel density estimation and its application." ITM web of conferences. Vol. 23. EDP Sciences, 2018.</li><li id="ref-23" value="23">Van Erven, Tim, and Peter Harremos. "Rényi divergence and Kullback-Leibler divergence." IEEE Transactions on Information Theory 60.7 (2014): 3797-3820.</li><li id="ref-24" value="24">Sklar, Abe. "Random variables, joint distribution functions, and copulas." Kybernetika 9.6 (1973): 449-460.</li></ol></div>
+
+
+</body></html>
